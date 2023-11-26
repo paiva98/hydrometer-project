@@ -1,3 +1,73 @@
-#app {
-    background-color: aqua;
+:root {
+  --background-color: #2E2E3A;
+  --text-color: #FFFFFF;
+  --button-color: #8A2BE2;
+  --link-color: #4169E1;
+  --highlight-color: #9932CC;
+  --accent-color: #9400D3;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+  
+button {
+  background-color: var(--button-color);
+  color: var(--text-color);
+}
+
+button {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13;
+  width: 165px;
+  height: 35px;
+  background-color: var(--button-color);
+  padding: 9px 50px;
+  border: none;
+  color: var(--text-color);;
+}
+
+
+a {
+  color: var(--link-color);
+}
+
+.highlight {
+  background-color: var(--highlight-color);
+  color: var(--text-color);
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+#app{
+  display: grid;
+  grid-template-areas: "header main";
+  grid-template-columns: 100px 1fr;
+  height: 100vh;
+}
+
+header{
+  grid-area: header;
+  background-color: white;
+  border-right: 1px solid black;
+}
+
+main {
+  grid-area: main;
+}
+
+nav{
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px 0 10px;
+  gap: 10px;
+}
+
+h1{
+  color: black;
 }

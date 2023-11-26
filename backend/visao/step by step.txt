@@ -1,0 +1,4 @@
+$pyhton3
+>>> from database import BancoDeDados
+>>> bd = BancoDeDados('../../database/database.db')
+>>> bd.config_database()
