@@ -38,11 +38,9 @@ class BancoDeDados:
 
     def insert(self, code, value, name=None, date=None):
 
-        print("aaaaaaaaaaaaaa", code, value, name, date)
-
         if date is None:
             date = datetime.now()
-            date = date.strftime('%Y-%m-%d')
+            date = date.strftime('%Y-%m-%d %H:%M:%S')
 
         if name is None:
             name = "Nao definido"
@@ -81,17 +79,21 @@ class BancoDeDados:
         cursor = conn.cursor()
 
         cursor.execute('''
-            SELECT h.id, h.code, h.name, p.value, p.date
+            SELECT h.id, h.code, h.name, p.value, p.date, 
+            COALESCE(
+                (SELECT value FROM predictions WHERE hydrometer_id = h.id AND date = date('now', '-{} day')),
+                (SELECT value FROM predictions WHERE hydrometer_id = h.id AND date < date('now', '-{} day') ORDER BY date DESC LIMIT 1)
+            ) AS previous_value
             FROM hydrometers h
             JOIN predictions p ON h.id = p.hydrometer_id
-            WHERE p.date >= date('now', '-{} day')
-            ORDER BY p.date
-        '''.format(days))
+            WHERE p.date = (SELECT MAX(date) FROM predictions WHERE hydrometer_id = h.id)
+            ORDER BY h.name, p.date
+        '''.format(days, days))
 
         results = cursor.fetchall()
         conn.close()
         return results
-    
+
     def config_database(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -103,13 +105,13 @@ class BancoDeDados:
     def populate_database(self, num_hidrometros, num_predicoes):
         fake = Faker()
         for _ in range(num_hidrometros):
-            code = str(random.randint(1000, 99999))  # gera um código de hidrômetro aleatório
-            name = fake.name()  # gera um nome aleatório
+            code = str(random.randint(1000, 99999))
+            name = fake.name()
 
             for _ in range(num_predicoes):
-                value = str(random.randint(1000000, 9999999))  # gera um valor de previsão aleatório
-                date = datetime.now() - timedelta(days=random.randint(0, 365))  # gera uma data aleatória no último ano
-                date = date.strftime('%Y-%m-%d')
+                value = str(random.randint(1000000, 9999999))
+                date = datetime.now() - timedelta(days=random.randint(0, 365))
+                date = date.strftime('%Y-%m-%d %H:%M:%S')
                 self.insert(code, value, name, date)
 
 

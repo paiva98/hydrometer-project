@@ -8,7 +8,7 @@
 const char *ssid = "10S";     // Nome da rede
 const char *pass = "21211345";// Senha da rede
 
-String urlAPI = "http://192.168.125.39:5000/send_image";
+String urlAPI = "http://192.168.169.39:5000/send_image";
 String codigo = "3070";
 
 HTTPClient http;              // Objeto http usado nas requisicoes

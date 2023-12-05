@@ -1,10 +1,13 @@
 :root {
   --background-color: #2E2E3A;
+  --background-header-color: #DCDCDC;
   --text-color: #FFFFFF;
-  --button-color: #8A2BE2;
+  --text-color-black: #333;
+  --button-color: #1e7898;
   --link-color: #4169E1;
-  --highlight-color: #9932CC;
-  --accent-color: #9400D3;
+  --highlight-color: #51abcb;
+  --accent-color: #2596be;
+  --action: #45a049;
 }
 
 body {
@@ -17,6 +20,10 @@ body {
 button {
   background-color: var(--button-color);
   color: var(--text-color);
+}
+
+hr {
+  border-top: 1px solid #8c8b8b;
 }
 
 button {
@@ -53,8 +60,8 @@ a {
 
 header{
   grid-area: header;
-  background-color: white;
   border-right: 1px solid black;
+  background-color: var(--background-header-color);
 }
 
 main {
