@@ -98,6 +98,16 @@ def get_hydrometers():
     except Exception as e:
         return jsonify({"erro": str(e)})
 
+@app.route('/get_hydrometers2', methods=["GET"])
+def get_hydrometers2():
+    try:
+        days = 100
+        hydrometers  = bd.get_hydrometers_with_predictions2(days)
+
+        return hydrometers
+    
+    except Exception as e:
+        return jsonify({"erro": str(e)})
 
 if __name__ == '__main__':
     app.run(host='192.168.169.39', debug=True)
