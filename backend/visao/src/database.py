@@ -80,26 +80,6 @@ class BancoDeDados:
         results = cursor.fetchall()
         conn.close()
         return results
-    
-    def get_hydrometers_with_predictions(self, days):
-        conn = self.connect()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            SELECT h.id, h.code, h.name, p.value, p.date, 
-            COALESCE(
-                (SELECT value FROM predictions WHERE hydrometer_id = h.id AND date = date('now', '-{} day')),
-                (SELECT value FROM predictions WHERE hydrometer_id = h.id AND date < date('now', '-{} day') ORDER BY date DESC LIMIT 1)
-            ) AS previous_value
-            FROM hydrometers h
-            JOIN predictions p ON h.id = p.hydrometer_id
-            WHERE p.date = (SELECT MAX(date) FROM predictions WHERE hydrometer_id = h.id)
-            ORDER BY h.name, p.date
-        '''.format(days, days))
-
-        results = cursor.fetchall()
-        conn.close()
-        return results
    
     def populate_database(self, num_hidrometros, num_predicoes):
         fake = Faker()
@@ -113,7 +93,7 @@ class BancoDeDados:
                 date = date.strftime('%Y-%m-%d %H:%M:%S')
                 self.insert(code, value, name, date)
 
-    def get_hydrometers_with_predictions2(self, days):
+    def get_hydrometers_with_predictions(self, days):
         conn = self.connect()
         cursor = conn.cursor()
 
@@ -129,29 +109,22 @@ class BancoDeDados:
         for e in results:
             values.append(e[0])
 
-        # Cria uma lista vazia para armazenar os resultados
         output = []
 
-        # Usa um loop for para iterar sobre a lista de valores
         for value in values:
-            # Executa a consulta SQL com a substituição de parâmetros
             cursor.execute('''
                 SELECT SUM(CAST(value AS INTEGER)) AS water_consumption 
                 FROM predictions WHERE hydrometer_id = ? 
                 AND date BETWEEN DATE('now', 'start of day', '-' || ? || ' days') 
                 AND DATE('now', 'start of day')
-            ''', (value, days)) # Substitui os ? pelo valor de hydrometer_id e o número de dias
+            ''', (value, days))
             
-            # Obtém o resultado da consulta
             result = cursor.fetchone()
 
-            # Adiciona uma tupla com o hydrometer_id e o water_consumption à lista de saída
             output.append((value, result[0]))
 
-        # Fecha a conexão
         conn.close()
 
-        # Retorna a lista de saída
         return output
 
 
