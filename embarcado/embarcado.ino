@@ -5,10 +5,12 @@
 
 #define LED_BUILTIN 2         // Pino de LED
 
-const char *ssid = "10S";     // Nome da rede
-const char *pass = "21211345";// Senha da rede
+#define EAP_ANONYMOUS_IDENTITY ""
+#define EAP_IDENTITY "<CPF>"
+#define EAP_PASSWORD "<SENHA_SAPIES">"
+#define SSID "WIFI-UFV2"
 
-String urlAPI = "http://192.168.169.39:5000/send_image";
+String urlAPI = "http://192.168.169.39:5000/send_image";  
 String codigo = "3070";
 
 HTTPClient http;              // Objeto http usado nas requisicoes
@@ -71,7 +73,8 @@ void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN, OUTPUT);
 
-  WiFi.begin(ssid, pass); // Define as configuracoes do wifi
+  // WiFi.begin(ssid, pass); // Define as configuracoes do wifi
+  WiFi.begin(SSID, WPA2_AUTH_PEAP, EAP_ANONYMOUS_IDENTITY, EAP_IDENTITY, EAP_PASSWORD);
   conectWIFi();
 
   setCAM();
