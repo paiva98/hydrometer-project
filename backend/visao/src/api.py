@@ -73,8 +73,27 @@ def get_hydrometers():
     try:
         days = request.args.get('days', default = 1, type = int)
 
-        res = bd.get_hydrometers_with_predictions(days) # passar o número de dias como parâmetro
-        return res
+        res = bd.get_hydrometers_with_predictions(days)
+        print(res)
+        
+        # Formatar os resultados
+        formatted_res = {}
+        for key, values in res.items():
+            # Converter as strings em números (metros cúbicos e litros)
+            newest_value = int(values['newestValue'][:-3]) * 1000 + int(values['newestValue'][-3:])
+            oldest_value = int(values['oldestValue'][:-3]) * 1000 + int(values['oldestValue'][-3:])
+            
+            # Calcular o consumo
+            consumed = abs(newest_value - oldest_value)
+            
+            # Adicionar ao dicionário formatado
+            formatted_res[key] = {
+                "name": key,
+                "last_value": values['newestValue'],
+                "consumed": consumed
+            }
+        
+        return formatted_res
     
     except Exception as e:
         return jsonify({"erro": str(e)})

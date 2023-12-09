@@ -94,37 +94,63 @@ class BancoDeDados:
                 self.insert(code, value, name, date)
 
     def get_hydrometers_with_predictions(self, days):
+        hydrometers_predictions = {}
+
         conn = self.connect()
         cursor = conn.cursor()
 
         cursor.execute('''
-            SELECT id
+            SELECT id, name
             FROM hydrometers
             ORDER BY name       
         ''')
+        results_hydrometers = cursor.fetchall()
 
-        results = cursor.fetchall()
-
-        values = []
-        for e in results:
-            values.append(e[0])
-
-        output = []
-
-        for value in values:
-            cursor.execute('''
-                SELECT SUM(CAST(value AS INTEGER)) AS water_consumption 
-                FROM predictions WHERE hydrometer_id = ? 
-                AND date BETWEEN DATE('now', 'start of day', '-' || ? || ' days') 
-                AND DATE('now', 'start of day')
-            ''', (value, days))
+        for hydrometer in results_hydrometers:
+            params = {'hydrometer_id': hydrometer[0], 'day': days}
             
-            result = cursor.fetchone()
+            # Encontrar o valor da previsão mais antiga
+            cursor.execute('''
+                SELECT value
+                FROM predictions
+                WHERE 
+                    hydrometer_id = :hydrometer_id AND
+                    date = (
+                        SELECT MIN(date)
+                        FROM predictions
+                        WHERE 
+                            hydrometer_id = :hydrometer_id AND
+                            date >= datetime('now', '-' || :day || ' day')
+                    )
+            ''', params)
+            oldest_result = cursor.fetchone()
+            oldest_value = oldest_result[0] if oldest_result is not None else '0000000'
 
-            output.append((value, result[0]))
+            params['oldest_date'] = oldest_value
 
-        conn.close()
+            # Encontrar o valor da previsão mais recente que esteja entre a data mais antiga e a data atual
+            cursor.execute('''
+                SELECT value
+                FROM predictions
+                WHERE 
+                    hydrometer_id = :hydrometer_id AND
+                    date = (
+                        SELECT MAX(date)
+                        FROM predictions
+                        WHERE 
+                            hydrometer_id = :hydrometer_id AND
+                            date > :oldest_date AND
+                            date <= datetime('now')
+                    )
+            ''', params)
+            newest_result = cursor.fetchone()
+            newest_value = newest_result[0] if newest_result is not None and oldest_result is not None  else '0000000'
 
-        return output
+            hydrometers_predictions[hydrometer[1]] = {
+                "oldestValue": oldest_value,
+                "newestValue": newest_value
+            }
+
+        return hydrometers_predictions
 
 
