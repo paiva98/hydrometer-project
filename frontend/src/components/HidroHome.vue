@@ -2,9 +2,6 @@
     <div>
         <div class="menuRange">
             <div class="menuRangeButtons">
-                <button @click="updateHydrometers(0)" v-bind:class="{ active: activeButton === 0 }">
-                    <span>Litros / Hoje</span>
-                </button>
                 <button @click="updateHydrometers(1)" v-bind:class="{ active: activeButton === 1 }">
                     <span>Litros / Dia</span>
                 </button>
@@ -29,12 +26,12 @@
                     <span class="name">{{ hydrometer.name }}</span>
                     <div class="helice"></div>
                     <div class="mostrador" id="mostrador">
-                        <span class="preto" id="preto">{{ String(hydrometer.prediction.value).slice(0, -3).split('').join('|') }}|</span>
-                        <span class="vermelho" id="vermelho">{{ String(hydrometer.prediction.value).slice(-3).split('').join('|') }}</span>
+                        <span class="preto" id="preto">{{ String(hydrometer.last_value).slice(0, -3).split('').join('|') }}|</span>
+                        <span class="vermelho" id="vermelho">{{ String(hydrometer.last_value).slice(-3).split('').join('|') }}</span>
                     </div>
                 </div>
                 <div class="consumo">
-                    <span class="consumido">{{ hydrometer.prediction.consumed }} L</span>
+                    <span class="consumido">{{ hydrometer.consumed }} L</span>
                 </div>
             </div>
         </div>
@@ -44,7 +41,6 @@
 
 <script>
 import axios from  'axios';
-import HydrometerValues from './HydrometerValues.vue'
 
 export default {
     data: () => ({
@@ -52,15 +48,15 @@ export default {
         activeButton: 0,
     }),
     async mounted() {
-        this.updateHydrometers(0)
+        this.updateHydrometers(1)
     },
     methods: {
         async updateHydrometers(days){
             this.activeButton = days;
 
+            console.log(days)
             try{
-                const res = await axios.get(`http://localhost:5000/get_hydrometers?days=${days}`);
-                console.log(res.data)
+                const res = await axios.get(`http://200.235.131.202:5000/get_hydrometers?days=${days}`);
                 this.hydrometers = res.data;
             } catch (error){
                 console.log(error);

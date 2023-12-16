@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import HomeView2 from '../views/HomeView2.vue'
+import LastImage from '../views/LastImage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/home2',
       name: 'home2',
       component: HomeView2
+    },
+    {
+      path: '/image',
+      name: 'image',
+      component: LastImage
     },
     // {
     //   path: '/about',

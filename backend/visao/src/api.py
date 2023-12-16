@@ -5,6 +5,7 @@ import torch
 import io
 import numpy as np
 from math import floor
+import base64
 
 from database import BancoDeDados
 
@@ -74,7 +75,6 @@ def get_hydrometers():
         days = request.args.get('days', default = 1, type = int)
 
         res = bd.get_hydrometers_with_predictions(days)
-        print(res)
         
         # Formatar os resultados
         formatted_res = {}
@@ -97,7 +97,13 @@ def get_hydrometers():
     
     except Exception as e:
         return jsonify({"erro": str(e)})
-    
+
+@app.route('/get_last_image', methods=["GET"])
+def get_last_image():
+    with open("temp.jpg", "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+
+    return jsonify({'image': encoded_string})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
